@@ -94,6 +94,7 @@ class GetWeather {
     required this.condition,
     required this.lat,
     required this.lon,
+    required this.dt,
   });
 
   String name;
@@ -101,14 +102,15 @@ class GetWeather {
   int condition;
   double lat;
   double lon;
+  int dt;
 
   factory GetWeather.fromJson(Map<dynamic, dynamic> json) => GetWeather(
-        name: json['name'],
-        temperature: json['main']['temp'],
-        condition: json['weather'][0]['id'],
-        lat: json['coord']['lat'],
-        lon: json['coord']['lon'],
-      );
+      name: json['name'],
+      temperature: json['main']['temp'],
+      condition: json['weather'][0]['id'],
+      lat: json['coord']['lat'],
+      lon: json['coord']['lon'],
+      dt: json['dt']);
 
   Map<dynamic, dynamic> toJson() => {
         'name': name,
@@ -116,5 +118,28 @@ class GetWeather {
         'id': condition,
         'lat': lat,
         'lon': lon,
+        'dt': dt,
       };
+
+  String getDifference() {
+    var unix = DateTime.fromMillisecondsSinceEpoch(dt * 1000);
+    var now = DateTime.now();
+    var difference = now.difference(unix);
+    if (difference.inMinutes <= 59) {
+      if (difference.inMinutes == 1 || difference.inMinutes == 0) {
+        return 'Last data update ${difference.inMinutes} minute ago';
+      }
+      return 'Last data update ${difference.inMinutes} minutes ago';
+    } else if (difference.inHours <= 23) {
+      if (difference.inHours == 1) {
+        return 'Last data update ${difference.inHours} hour ago';
+      }
+      return 'Last data update ${difference.inHours} hours ago';
+    } else {
+      if (difference.inDays == 1) {
+        return 'Last data update ${difference.inDays} day ago';
+      }
+      return 'Last data update ${difference.inDays} days ago';
+    }
+  }
 }

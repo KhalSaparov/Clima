@@ -30,6 +30,7 @@ class _LocationScreenState extends State<LocationScreen> {
   late String cityName;
   late GetWeather getWeather;
   late GetWeatherOneCall getWeatherOneCall;
+  late String difference;
   bool showSpinner = false;
 
   @override
@@ -94,6 +95,11 @@ class _LocationScreenState extends State<LocationScreen> {
                             color: Colors.white,
                           ),
                         ),
+                        SizedBox(
+                            child: _connectivityResult == ConnectivityResult.mobile ||
+                                    _connectivityResult == ConnectivityResult.wifi
+                                ? null
+                                : Text(difference)),
                         TextButton(
                           onPressed: () async {
                             if (_connectivityResult == ConnectivityResult.mobile ||
@@ -154,7 +160,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Text(
                         '$weatherMessage in $cityName',
                         style: kMessageTextStyle,
@@ -286,6 +292,7 @@ class _LocationScreenState extends State<LocationScreen> {
         Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       setState(() {
         _connectivityResult = result;
+        print(_connectivityResult);
       });
     });
     final ConnectivityResult result = await Connectivity().checkConnectivity();
@@ -310,6 +317,7 @@ class _LocationScreenState extends State<LocationScreen> {
       weatherIcon = weatherModel.getWeatherIcon(getWeather.condition);
       weatherPicture = weatherModel.getWeatherPicture(getWeather.condition);
       cityName = getWeather.name;
+      difference = getWeather.getDifference();
     });
   }
 
