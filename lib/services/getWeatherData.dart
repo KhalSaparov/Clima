@@ -14,13 +14,13 @@ class GetWeatherOneCall {
   List hourly;
   String timeZone;
 
-  factory GetWeatherOneCall.fromJson(Map<String, dynamic> json) => GetWeatherOneCall(
+  factory GetWeatherOneCall.fromJson(Map<dynamic, dynamic> json) => GetWeatherOneCall(
         daily: json['daily'],
         hourly: json['hourly'],
         timeZone: json['timezone'],
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<dynamic, dynamic> toJson() => {
         'daily': daily,
         'hourly': hourly,
         'timezone': timeZone,
@@ -102,7 +102,7 @@ class GetWeather {
   double lat;
   double lon;
 
-  factory GetWeather.fromJson(Map<String, dynamic> json) => GetWeather(
+  factory GetWeather.fromJson(Map<dynamic, dynamic> json) => GetWeather(
         name: json['name'],
         temperature: json['main']['temp'],
         condition: json['weather'][0]['id'],
@@ -110,7 +110,7 @@ class GetWeather {
         lon: json['coord']['lon'],
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<dynamic, dynamic> toJson() => {
         'name': name,
         'temp': temperature,
         'id': condition,

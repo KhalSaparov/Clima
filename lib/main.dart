@@ -1,8 +1,12 @@
 import 'package:clima/screens/loading_screen.dart';
+import 'package:clima/utilities/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:connection_notifier/connection_notifier.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  await Hive.openBox(API_BOX);
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }

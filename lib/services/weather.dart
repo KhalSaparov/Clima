@@ -1,5 +1,9 @@
 import 'package:clima/services/location.dart';
 import 'package:clima/services/networking.dart';
+import 'package:clima/utilities/constants.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 const apiKey = '1ed0f9ffa7250abce22959398a0d9b1e';
 const openWeatherMapURL = 'https://api.openweathermap.org/data/2.5/weather';
@@ -15,22 +19,38 @@ class WeatherModel {
   }
 
   Future<dynamic> getLocationWeather() async {
-    Location location = Location();
-    await location.getCurrentLocation();
+    final ConnectivityResult result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.wifi || result == ConnectivityResult.mobile) {
+      Location location = Location();
+      await location.getCurrentLocation();
 
-    NetworkHelper networkHelper = NetworkHelper(
-        '$openWeatherMapURL?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
+      NetworkHelper networkHelper = NetworkHelper(
+          '$openWeatherMapURL?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
 
-    var weatherData = await networkHelper.getData();
-    return weatherData;
+      var weatherData = await networkHelper.getData();
+      Hive.box(API_BOX).put(WEATHER_DATA, weatherData);
+      return weatherData;
+    } else {
+      return Hive.box(API_BOX).get(WEATHER_DATA, defaultValue: []);
+    }
   }
 
   Future<dynamic> getWeatherOneCall(double latitude, double longitude) async {
-    NetworkHelper networkHelper = NetworkHelper(
-        '$openWeatherMapURLOneCall?lat=$latitude&lon=$longitude&exclude=current,minutely,alerts&appid=$apiKey&units=metric');
-
-    var weatherData = await networkHelper.getData();
-    return weatherData;
+    final ConnectivityResult result = await Connectivity().checkConnectivity();
+    // var hiveWeatherOneCall = Hive.box(API_BOX).get(WEATHER_ONE_CALL, defaultValue: []);
+    // if (hiveWeatherOneCall.isNotEmpty) {
+    //   print('get from hive: $hiveWeatherOneCall');
+    //   return hiveWeatherOneCall;
+    // }
+    if (result == ConnectivityResult.wifi || result == ConnectivityResult.mobile) {
+      NetworkHelper networkHelper = NetworkHelper(
+          '$openWeatherMapURLOneCall?lat=$latitude&lon=$longitude&exclude=current,minutely,alerts&appid=$apiKey&units=metric');
+      var weatherData = await networkHelper.getData();
+      Hive.box(API_BOX).put(WEATHER_ONE_CALL, weatherData);
+      return weatherData;
+    } else {
+      return Hive.box(API_BOX).get(WEATHER_ONE_CALL, defaultValue: []);
+    }
   }
 
   String getWeatherIcon(int condition) {
