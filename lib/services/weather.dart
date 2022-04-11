@@ -37,11 +37,6 @@ class WeatherModel {
 
   Future<dynamic> getWeatherOneCall(double latitude, double longitude) async {
     final ConnectivityResult result = await Connectivity().checkConnectivity();
-    // var hiveWeatherOneCall = Hive.box(API_BOX).get(WEATHER_ONE_CALL, defaultValue: []);
-    // if (hiveWeatherOneCall.isNotEmpty) {
-    //   print('get from hive: $hiveWeatherOneCall');
-    //   return hiveWeatherOneCall;
-    // }
     if (result == ConnectivityResult.wifi || result == ConnectivityResult.mobile) {
       NetworkHelper networkHelper = NetworkHelper(
           '$openWeatherMapURLOneCall?lat=$latitude&lon=$longitude&exclude=current,minutely,alerts&appid=$apiKey&units=metric');
