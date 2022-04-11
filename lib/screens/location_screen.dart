@@ -40,38 +40,6 @@ class _LocationScreenState extends State<LocationScreen> {
     updateUIOneCall(widget.oneCallWeather);
   }
 
-  Future<void> _checkConnectivityState() async {
-    StreamSubscription _connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      setState(() {
-        _connectivityResult = result;
-      });
-    });
-    final ConnectivityResult result = await Connectivity().checkConnectivity();
-    setState(() {
-      _connectivityResult = result;
-    });
-  }
-
-  void updateUI(dynamic weatherData) async {
-    setState(() {
-      if (weatherData == null) {
-        temp = 0;
-        weatherIcon = 'Error';
-        weatherPicture = 'images/location_background.jpg';
-        weatherMessage = 'Unable to get weather data';
-        cityName = '';
-        return;
-      }
-      getWeather = GetWeather.fromJson(weatherData);
-      temp = getWeather.temperature.toInt();
-      weatherMessage = weatherModel.getMessage(temp);
-      weatherIcon = weatherModel.getWeatherIcon(getWeather.condition);
-      weatherPicture = weatherModel.getWeatherPicture(getWeather.condition);
-      cityName = getWeather.name;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -313,19 +281,36 @@ class _LocationScreenState extends State<LocationScreen> {
     );
   }
 
-  Widget getRow(int i, dynamic temp) {
-    return Column(
-      children: [
-        Text(
-          weatherIcon,
-          style: kConditionTextStyle,
-        ),
-        Text(
-          '${temp[i]}°',
-          style: kTempTextStyle.copyWith(fontSize: 30.0),
-        ),
-      ],
-    );
+  Future<void> _checkConnectivityState() async {
+    StreamSubscription _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      setState(() {
+        _connectivityResult = result;
+      });
+    });
+    final ConnectivityResult result = await Connectivity().checkConnectivity();
+    setState(() {
+      _connectivityResult = result;
+    });
+  }
+
+  void updateUI(dynamic weatherData) async {
+    setState(() {
+      if (weatherData == null) {
+        temp = 0;
+        weatherIcon = 'Error';
+        weatherPicture = 'images/location_background.jpg';
+        weatherMessage = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      getWeather = GetWeather.fromJson(weatherData);
+      temp = getWeather.temperature.toInt();
+      weatherMessage = weatherModel.getMessage(temp);
+      weatherIcon = weatherModel.getWeatherIcon(getWeather.condition);
+      weatherPicture = weatherModel.getWeatherPicture(getWeather.condition);
+      cityName = getWeather.name;
+    });
   }
 
   void updateUIOneCall(dynamic weatherData) async {
