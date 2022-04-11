@@ -27,7 +27,7 @@ class WeatherModel {
 
   Future<dynamic> getWeatherOneCall(double latitude, double longitude) async {
     NetworkHelper networkHelper = NetworkHelper(
-        '$openWeatherMapURL?lat=$latitude&lon=$longitude&exclude=minutely,alerts&appid=$apiKey&units=metric');
+        '$openWeatherMapURLOneCall?lat=$latitude&lon=$longitude&exclude=current,minutely,alerts&appid=$apiKey&units=metric');
 
     var weatherData = await networkHelper.getData();
     return weatherData;

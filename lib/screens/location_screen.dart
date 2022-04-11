@@ -1,12 +1,15 @@
+import 'package:clima/services/getWeatherData.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:clima/services/weather.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'city_screen.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({Key? key, this.locationWeather}) : super(key: key);
+  const LocationScreen({Key? key, this.locationWeather, this.oneCallWeather}) : super(key: key);
 
   final dynamic locationWeather;
+  final dynamic oneCallWeather;
 
   @override
   _LocationScreenState createState() => _LocationScreenState();
@@ -20,25 +23,18 @@ class _LocationScreenState extends State<LocationScreen> {
   late String weatherPicture;
   late String weatherMessage;
   late String cityName;
-  late GetWeather welcome;
-
-  List tempData = [
-    10,
-    20,
-    30,
-    30,
-    30,
-    30,
-    30,
-  ];
+  late GetWeather getWeather;
+  late GetWeatherOneCall getWeatherOneCall;
+  bool showSpinner = false;
 
   @override
   void initState() {
     super.initState();
     updateUI(widget.locationWeather);
+    updateUIOneCall(widget.oneCallWeather);
   }
 
-  void updateUI(dynamic weatherData) {
+  void updateUI(dynamic weatherData) async {
     setState(() {
       if (weatherData == null) {
         temp = 0;
@@ -48,56 +44,57 @@ class _LocationScreenState extends State<LocationScreen> {
         cityName = '';
         return;
       }
-      final getWeather = GetWeather.fromJson(weatherData);
-
+      getWeather = GetWeather.fromJson(weatherData);
       temp = getWeather.temperature.toInt();
       weatherMessage = weatherModel.getMessage(temp);
-
       weatherIcon = weatherModel.getWeatherIcon(getWeather.condition);
       weatherPicture = weatherModel.getWeatherPicture(getWeather.condition);
-
       cityName = getWeather.name;
-
-      double lat = getWeather.lat;
-      double lon = getWeather.lon;
-      print(lat);
-      print(lon);
-
-      var w = weatherModel.getWeatherOneCall(lat, lon);
-      final getWeatherOneCall = GetWeather.fromJson(weatherData);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(weatherPicture),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.dstATop),
-          ),
-        ),
-        constraints: const BoxConstraints.expand(),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: ModalProgressHUD(
+          inAsyncCall: showSpinner,
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(weatherPicture),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.dstATop),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Expanded(
-                    child: Row(
+            ),
+            constraints: const BoxConstraints.expand(),
+            child: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         TextButton(
                           onPressed: () async {
-                            var weatherData = await weatherModel.getLocationWeather();
-                            updateUI(weatherData);
+                            setState(() {
+                              showSpinner = true;
+                            });
+                            try {
+                              var weatherData = await weatherModel.getLocationWeather();
+                              var weatherDataOneCall = await weatherModel.getWeatherOneCall(
+                                  weatherData['coord']['lat'], weatherData['coord']['lon']);
+                              updateUI(weatherData);
+                              updateUIOneCall(weatherDataOneCall);
+                              setState(() {
+                                showSpinner = false;
+                              });
+                            } catch (e) {
+                              print(e);
+                            }
                           },
                           child: const Icon(
                             Icons.near_me,
@@ -113,10 +110,27 @@ class _LocationScreenState extends State<LocationScreen> {
                                 builder: (context) => const CityScreen(),
                               ),
                             );
-                            if (typedName != null) {
-                              var weatherData = await weatherModel.getCityWeather(typedName);
-                              updateUI(weatherData);
+                            try {
+                              if (typedName != null) {
+                                setState(() {
+                                  showSpinner = true;
+                                });
+                                var weatherData = await weatherModel.getCityWeather(typedName);
+                                var weatherDataOneCall = await weatherModel.getWeatherOneCall(
+                                    weatherData['coord']['lat'], weatherData['coord']['lon']);
+                                updateUI(weatherData);
+                                updateUIOneCall(weatherDataOneCall);
+                              } else {
+                                setState(() {
+                                  showSpinner = false;
+                                });
+                              }
+                            } catch (e) {
+                              print(e);
                             }
+                            setState(() {
+                              showSpinner = false;
+                            });
                           },
                           child: const Icon(
                             Icons.location_city,
@@ -126,12 +140,10 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                       ],
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
+                    Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
                             '$temp°',
@@ -144,70 +156,126 @@ class _LocationScreenState extends State<LocationScreen> {
                         ],
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 15.0),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
                       child: Text(
                         '$weatherMessage in $cityName',
-                        textAlign: TextAlign.right,
-                        style: kMessageTextStyle.copyWith(fontSize: 30.0),
+                        style: kMessageTextStyle,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: ListView.builder(
-                        physics: const ClampingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: tempData.length,
-                        itemBuilder: (BuildContext context, int position) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${tempData[position]}',
-                                  style: kTempTextStyle.copyWith(fontSize: 30.0),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5.0),
+                      child: Divider(
+                        height: 5,
+                        thickness: 2,
+                        indent: 5,
+                        endIndent: 5,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 135,
+                      width: double.infinity,
+                      child: ListView.builder(
+                          physics: const ClampingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: getWeatherOneCall.getHourlyTemp().length,
+                          itemBuilder: (BuildContext context, int position) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFFFF).withOpacity(0.5),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Text(
-                                  '${tempData[position]}',
-                                  style: kTempTextStyle.copyWith(fontSize: 30.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            '${getWeatherOneCall.getHour()[position]}',
+                                            style: kRowTextStyle,
+                                          ),
+                                          Text(
+                                            '${getWeatherOneCall.getHourlyCon()[position]}',
+                                            style: kIconTextStyle,
+                                          ),
+                                          Text(
+                                            '${getWeatherOneCall.getHourlyTemp()[position]}°',
+                                            style: kRowTextStyle,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        }),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: ListView.builder(
-                        physics: const ClampingScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: tempData.length,
-                        itemBuilder: (BuildContext context, int position) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text(
-                                  '${tempData[position]}',
-                                  style: kTempTextStyle.copyWith(fontSize: 30.0),
-                                ),
-                                Text(
-                                  '${tempData[position]}',
-                                  style: kTempTextStyle.copyWith(fontSize: 30.0),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                  ),
-                ],
+                              ),
+                            );
+                          }),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF).withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemCount: getWeatherOneCall.getHourlyTemp().length,
+                              itemBuilder: (BuildContext context, int position) {
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              '${getWeatherOneCall.getDay()[position]}',
+                                              style: kColumnTextStyle,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              '${getWeatherOneCall.getDailyCon()[position]}',
+                                              style: kIconTextStyle,
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: Text(
+                                              '${getWeatherOneCall.getDailyTemp()[position]}',
+                                              style: kColumnTextStyle,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Divider(
+                                      height: 0,
+                                      thickness: 1,
+                                      indent: 8,
+                                      endIndent: 8,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                );
+                              }),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -230,36 +298,18 @@ class _LocationScreenState extends State<LocationScreen> {
       ],
     );
   }
-}
 
-class GetWeather {
-  GetWeather({
-    required this.name,
-    required this.temperature,
-    required this.condition,
-    required this.lat,
-    required this.lon,
-  });
-
-  String name;
-  double temperature;
-  int condition;
-  double lat;
-  double lon;
-
-  factory GetWeather.fromJson(Map<String, dynamic> json) => GetWeather(
-        name: json['name'],
-        temperature: json['main']['temp'],
-        condition: json['weather'][0]['id'],
-        lat: json['coord']['lat'],
-        lon: json['coord']['lon'],
-      );
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'temp': temperature,
-        'id': condition,
-        'lat': lat,
-        'lon': lon,
-      };
+  void updateUIOneCall(dynamic weatherData) async {
+    setState(() {
+      if (weatherData == null) {
+        temp = 0;
+        weatherIcon = 'Error';
+        weatherPicture = 'images/location_background.jpg';
+        weatherMessage = 'Unable to get weather data';
+        cityName = '';
+        return;
+      }
+      getWeatherOneCall = GetWeatherOneCall.fromJson(weatherData);
+    });
+  }
 }

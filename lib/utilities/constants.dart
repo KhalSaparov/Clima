@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+const String API_BOX = 'api_data';
+const String WEATHER_DATA = 'weatherData';
+const String WEATHER_ONE_CALL = 'weatherOneCall';
+
 const kTempTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
   fontSize: 100.0,
@@ -7,7 +11,22 @@ const kTempTextStyle = TextStyle(
 
 const kMessageTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
-  fontSize: 60.0,
+  fontSize: 30.0,
+);
+
+const kIconTextStyle = TextStyle(
+  fontFamily: 'Spartan MB',
+  fontSize: 30.0,
+);
+
+const kRowTextStyle = TextStyle(
+  fontFamily: 'Spartan MB',
+  fontSize: 20.0,
+);
+
+const kColumnTextStyle = TextStyle(
+  fontFamily: 'Spartan MB',
+  fontSize: 18.0,
 );
 
 const kButtonTextStyle = TextStyle(
