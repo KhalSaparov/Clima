@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'location_screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -21,7 +20,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
 
   void getLocationData() async {
-    final ConnectivityResult result = await Connectivity().checkConnectivity();
     var weatherData = await weatherModel.getLocationWeather();
     var weatherOneCall = await weatherModel.getWeatherOneCall(
         weatherData['coord']['lat'], weatherData['coord']['lon']);

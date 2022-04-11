@@ -4,6 +4,10 @@ const String API_BOX = 'api_data';
 const String WEATHER_DATA = 'weatherData';
 const String WEATHER_ONE_CALL = 'weatherOneCall';
 
+const snackBar = SnackBar(
+  content: Text('Please turn on mobile internet or Wi-Fi'),
+);
+
 const kTempTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
   fontSize: 100.0,

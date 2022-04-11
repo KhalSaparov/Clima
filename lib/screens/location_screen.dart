@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:clima/services/getWeatherData.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:clima/services/weather.dart';
@@ -17,6 +20,8 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weatherModel = WeatherModel();
+  ConnectivityResult? _connectivityResult;
+  late StreamSubscription _connectivitySubscription;
 
   late int temp;
   late String weatherIcon;
@@ -30,8 +35,22 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
+    _checkConnectivityState();
     updateUI(widget.locationWeather);
     updateUIOneCall(widget.oneCallWeather);
+  }
+
+  Future<void> _checkConnectivityState() async {
+    StreamSubscription _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      setState(() {
+        _connectivityResult = result;
+      });
+    });
+    final ConnectivityResult result = await Connectivity().checkConnectivity();
+    setState(() {
+      _connectivityResult = result;
+    });
   }
 
   void updateUI(dynamic weatherData) async {
@@ -80,20 +99,25 @@ class _LocationScreenState extends State<LocationScreen> {
                       children: <Widget>[
                         TextButton(
                           onPressed: () async {
-                            setState(() {
-                              showSpinner = true;
-                            });
-                            try {
-                              var weatherData = await weatherModel.getLocationWeather();
-                              var weatherDataOneCall = await weatherModel.getWeatherOneCall(
-                                  weatherData['coord']['lat'], weatherData['coord']['lon']);
-                              updateUI(weatherData);
-                              updateUIOneCall(weatherDataOneCall);
+                            if (_connectivityResult == ConnectivityResult.mobile ||
+                                _connectivityResult == ConnectivityResult.wifi) {
                               setState(() {
-                                showSpinner = false;
+                                showSpinner = true;
                               });
-                            } catch (e) {
-                              print(e);
+                              try {
+                                var weatherData = await weatherModel.getLocationWeather();
+                                var weatherDataOneCall = await weatherModel.getWeatherOneCall(
+                                    weatherData['coord']['lat'], weatherData['coord']['lon']);
+                                updateUI(weatherData);
+                                updateUIOneCall(weatherDataOneCall);
+                                setState(() {
+                                  showSpinner = false;
+                                });
+                              } catch (e) {
+                                print(e);
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
                             }
                           },
                           child: const Icon(
@@ -104,33 +128,38 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                         TextButton(
                           onPressed: () async {
-                            var typedName = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CityScreen(),
-                              ),
-                            );
-                            try {
-                              if (typedName != null) {
-                                setState(() {
-                                  showSpinner = true;
-                                });
-                                var weatherData = await weatherModel.getCityWeather(typedName);
-                                var weatherDataOneCall = await weatherModel.getWeatherOneCall(
-                                    weatherData['coord']['lat'], weatherData['coord']['lon']);
-                                updateUI(weatherData);
-                                updateUIOneCall(weatherDataOneCall);
-                              } else {
-                                setState(() {
-                                  showSpinner = false;
-                                });
+                            if (_connectivityResult == ConnectivityResult.mobile ||
+                                _connectivityResult == ConnectivityResult.wifi) {
+                              var typedName = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CityScreen(),
+                                ),
+                              );
+                              try {
+                                if (typedName != null) {
+                                  setState(() {
+                                    showSpinner = true;
+                                  });
+                                  var weatherData = await weatherModel.getCityWeather(typedName);
+                                  var weatherDataOneCall = await weatherModel.getWeatherOneCall(
+                                      weatherData['coord']['lat'], weatherData['coord']['lon']);
+                                  updateUI(weatherData);
+                                  updateUIOneCall(weatherDataOneCall);
+                                } else {
+                                  setState(() {
+                                    showSpinner = false;
+                                  });
+                                }
+                              } catch (e) {
+                                print(e);
                               }
-                            } catch (e) {
-                              print(e);
+                              setState(() {
+                                showSpinner = false;
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
                             }
-                            setState(() {
-                              showSpinner = false;
-                            });
                           },
                           child: const Icon(
                             Icons.location_city,
