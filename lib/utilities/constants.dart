@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 const String API_BOX = 'api_data';
 const String WEATHER_DATA = 'weatherData';
 const String WEATHER_ONE_CALL = 'weatherOneCall';
+const String CITY_RU = 'cityRU';
 const String enLanguage = '🇬🇧';
 const String rusLanguage = '🇷🇺';
 
@@ -12,7 +13,7 @@ const snackBar = SnackBar(
 
 const kTempTextStyle = TextStyle(
   fontFamily: 'Spartan MB',
-  fontSize: 100.0,
+  fontSize: 90.0,
 );
 
 const kMessageTextStyle = TextStyle(
@@ -47,7 +48,7 @@ const kButtonTextStyle = TextStyle(
 );
 
 const kConditionTextStyle = TextStyle(
-  fontSize: 100.0,
+  fontSize: 90.0,
 );
 
 const kTextFieldInputDecoration = InputDecoration(

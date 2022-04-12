@@ -4,6 +4,7 @@ import 'package:clima/utilities/constants.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:translator/translator.dart';
 
 const apiKey = '1ed0f9ffa7250abce22959398a0d9b1e';
 const openWeatherMapURL = 'https://api.openweathermap.org/data/2.5/weather';
@@ -15,6 +16,9 @@ class WeatherModel {
         NetworkHelper('$openWeatherMapURL?q=$cityName&appid=$apiKey&units=metric');
 
     var weatherData = await networkHelper.getData();
+    final translator = GoogleTranslator();
+    var translation = await translator.translate(weatherData['name'], from: 'en', to: 'ru');
+    Hive.box(API_BOX).put(CITY_RU, translation.text);
     return weatherData;
   }
 
@@ -28,6 +32,9 @@ class WeatherModel {
           '$openWeatherMapURL?lat=${location.latitude}&lon=${location.longitude}&appid=$apiKey&units=metric');
 
       var weatherData = await networkHelper.getData();
+      final translator = GoogleTranslator();
+      var translation = await translator.translate(weatherData['name'], from: 'en', to: 'ru');
+      Hive.box(API_BOX).put(CITY_RU, translation.text);
       Hive.box(API_BOX).put(WEATHER_DATA, weatherData);
       return weatherData;
     } else {
@@ -91,23 +98,23 @@ class WeatherModel {
   String getMessage(int temp, String language) {
     if (language == rusLanguage) {
       if (temp > 25) {
-        return 'Время для 🍦 в';
+        return 'Время для 🍦';
       } else if (temp > 20) {
-        return 'Пора одевать шорты и 👕 в';
+        return 'Пора одевать шорты и 👕';
       } else if (temp < 10) {
-        return 'Надень 🧣 и 🧤, а то простудишься в';
+        return 'Надень 🧣 и 🧤, а то простудишься';
       } else {
-        return 'Берите 🧥 на всякий случай в';
+        return 'Берите 🧥 на всякий случай';
       }
     } else {
       if (temp > 77) {
-        return 'It\'s 🍦 time in';
+        return 'It\'s 🍦 time';
       } else if (temp > 68) {
-        return 'Time for shorts and 👕 in';
+        return 'Time for shorts and 👕';
       } else if (temp < 50) {
-        return 'You\'ll need 🧣 and 🧤 in';
+        return 'You\'ll need 🧣 and 🧤';
       } else {
-        return 'Bring a 🧥 just in case in';
+        return 'Bring a 🧥 just in case';
       }
     }
   }

@@ -1,6 +1,8 @@
 import 'package:clima/services/weather.dart';
 import 'package:clima/utilities/constants.dart';
 import 'package:date_format/date_format.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'getFahrenheit.dart';
@@ -129,6 +131,14 @@ class GetWeather {
       return '${temperature.toInt()} °C';
     } else {
       return '${getCurrentF.toFahrenheit()} °F';
+    }
+  }
+
+  String getCityName(String language) {
+    if (language == rusLanguage) {
+      return Hive.box(API_BOX).get(CITY_RU);
+    } else {
+      return name;
     }
   }
 

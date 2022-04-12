@@ -177,9 +177,17 @@ class _LocationScreenState extends State<LocationScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      padding: const EdgeInsets.only(bottom: 15.0),
                       child: Text(
-                        '${weatherModel.getMessage(getWeather.temperature.toInt(), language)} ${getWeather.name}',
+                        getWeather.getCityName(language),
+                        style: kMessageTextStyle,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text(
+                        weatherModel.getMessage(getWeather.temperature.toInt(), language),
                         style: kMessageTextStyle,
                       ),
                     ),
