@@ -55,7 +55,7 @@ class WeatherModel {
     }
   }
 
-  String getWeatherIcon(int condition) {
+  String getWeatherIcon(int condition, int hour) {
     if (condition < 300) {
       return '🌩';
     } else if (condition < 400) {
@@ -67,7 +67,11 @@ class WeatherModel {
     } else if (condition < 800) {
       return '🌫';
     } else if (condition == 800) {
-      return '☀️';
+      if (hour < 6 || hour >= 20) {
+        return '🌑';
+      } else {
+        return '☀️';
+      }
     } else if (condition <= 804) {
       return '☁️';
     } else {
@@ -75,23 +79,27 @@ class WeatherModel {
     }
   }
 
-  String getWeatherPicture(int condition) {
-    if (condition < 300) {
-      return 'images/storm.jpg';
-    } else if (condition < 400) {
-      return 'images/rainy.jpg';
-    } else if (condition < 600) {
-      return 'images/rain.jpg';
-    } else if (condition < 700) {
-      return 'images/snow.jpg';
-    } else if (condition < 800) {
-      return 'images/fog.jpg';
-    } else if (condition == 800) {
-      return 'images/shine.jpg';
-    } else if (condition <= 804) {
-      return 'images/cloud.jpg';
+  String getWeatherPicture(int condition, int hour) {
+    if (hour < 6 || hour >= 20) {
+      return 'images/night.jpg';
     } else {
-      return 'images/location_background.jpg';
+      if (condition < 300) {
+        return 'images/storm.jpg';
+      } else if (condition < 400) {
+        return 'images/rainy.jpg';
+      } else if (condition < 600) {
+        return 'images/rain.jpg';
+      } else if (condition < 700) {
+        return 'images/snow.jpg';
+      } else if (condition < 800) {
+        return 'images/fog.jpg';
+      } else if (condition == 800) {
+        return 'images/shine.jpg';
+      } else if (condition <= 804) {
+        return 'images/cloud.jpg';
+      } else {
+        return 'images/location_background.jpg';
+      }
     }
   }
 

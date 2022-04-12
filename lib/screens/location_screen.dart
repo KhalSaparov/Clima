@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:clima/services/get_weatherData.dart';
+import 'package:clima/services/get_weather_data.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
@@ -47,7 +47,8 @@ class _LocationScreenState extends State<LocationScreen> {
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(weatherModel.getWeatherPicture(getWeather.condition)),
+                image: AssetImage(weatherModel.getWeatherPicture(
+                    getWeather.condition, getWeatherOneCall.getDayNight()[0])),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.dstATop),
               ),
@@ -171,7 +172,8 @@ class _LocationScreenState extends State<LocationScreen> {
                             style: kTempTextStyle,
                           ),
                           Text(
-                            weatherModel.getWeatherIcon(getWeather.condition),
+                            weatherModel.getWeatherIcon(
+                                getWeather.condition, getWeatherOneCall.getDayNight()[0]),
                             style: kConditionTextStyle,
                           ),
                         ],
@@ -230,7 +232,9 @@ class _LocationScreenState extends State<LocationScreen> {
                                             style: kRowTextStyle,
                                           ),
                                           Text(
-                                            '${getWeatherOneCall.getHourlyCon()[position]}',
+                                            weatherModel.getWeatherIcon(
+                                                getWeatherOneCall.getHourlyCon()[position],
+                                                getWeatherOneCall.getDayNight()[position]),
                                             style: kIconTextStyle,
                                           ),
                                           Text(

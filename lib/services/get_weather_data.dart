@@ -48,7 +48,7 @@ class GetWeatherOneCall {
     List hourlyCon = [];
     for (var i = 0; i <= 6; i++) {
       int hCon = hourly[i]['weather'][0]['id'];
-      hourlyCon.add(WeatherModel().getWeatherIcon(hCon));
+      hourlyCon.add(hCon);
     }
     return hourlyCon;
   }
@@ -63,6 +63,18 @@ class GetWeatherOneCall {
       hourList.add(formatDate(hour, [HH, ':00']));
     }
     return hourList;
+  }
+
+  List getDayNight() {
+    tz.initializeTimeZones();
+    final getTimeZone = tz.getLocation(timeZone);
+    List dayNightList = [];
+    for (var i = 0; i <= 6; i++) {
+      var time = DateTime.fromMillisecondsSinceEpoch(hourly[i]['dt'] * 1000);
+      var hour = tz.TZDateTime.from(time, getTimeZone);
+      dayNightList.add(hour.hour);
+    }
+    return dayNightList;
   }
 
   List getDailyTemp(String language) {
@@ -82,10 +94,11 @@ class GetWeatherOneCall {
   }
 
   List getDailyCon() {
+    int day = 6;
     List dailyCon = [];
     for (var i = 0; i <= 6; i++) {
       int dCon = daily[i]['weather'][0]['id'];
-      dailyCon.add(WeatherModel().getWeatherIcon(dCon));
+      dailyCon.add(WeatherModel().getWeatherIcon(dCon, day));
     }
     return dailyCon;
   }
