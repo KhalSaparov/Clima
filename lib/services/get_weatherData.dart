@@ -145,6 +145,15 @@ class GetWeather {
     }
   }
 
+  int getTemp(String language) {
+    GetFahrenheit getCurrentF = GetFahrenheit(celsius: temperature);
+    if (language == rusLanguage) {
+      return temperature.toInt();
+    } else {
+      return getCurrentF.toFahrenheit();
+    }
+  }
+
   String getCityName(String language) {
     if (language == rusLanguage) {
       return Hive.box(API_BOX).get(CITY_RU);

@@ -188,7 +188,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
-                        weatherModel.getMessage(getWeather.temperature.toInt(), language),
+                        weatherModel.getMessage(getWeather.getTemp(language), language),
                         style: kMessageTextStyle,
                       ),
                     ),
