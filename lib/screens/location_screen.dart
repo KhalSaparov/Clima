@@ -23,14 +23,9 @@ class _LocationScreenState extends State<LocationScreen> {
   ConnectivityResult? _connectivityResult;
   late StreamSubscription _connectivitySubscription;
 
-  late int temp;
-  late String weatherIcon;
-  late String weatherPicture;
-  late String weatherMessage;
-  late String cityName;
   late GetWeather getWeather;
   late GetWeatherOneCall getWeatherOneCall;
-  late String difference;
+  late String language = rusLanguage;
   bool showSpinner = false;
 
   @override
@@ -51,7 +46,7 @@ class _LocationScreenState extends State<LocationScreen> {
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(weatherPicture),
+                image: AssetImage(weatherModel.getWeatherPicture(getWeather.condition)),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.dstATop),
               ),
@@ -64,81 +59,103 @@ class _LocationScreenState extends State<LocationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        TextButton(
-                          onPressed: () async {
-                            if (_connectivityResult == ConnectivityResult.mobile ||
-                                _connectivityResult == ConnectivityResult.wifi) {
-                              setState(() {
-                                showSpinner = true;
-                              });
-                              try {
-                                var weatherData = await weatherModel.getLocationWeather();
-                                var weatherDataOneCall = await weatherModel.getWeatherOneCall(
-                                    weatherData['coord']['lat'], weatherData['coord']['lon']);
-                                updateUI(weatherData);
-                                updateUIOneCall(weatherDataOneCall);
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () async {
+                              if (_connectivityResult == ConnectivityResult.mobile ||
+                                  _connectivityResult == ConnectivityResult.wifi) {
                                 setState(() {
-                                  showSpinner = false;
+                                  showSpinner = true;
                                 });
-                              } catch (e) {
-                                print(e);
-                              }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            }
-                          },
-                          child: const Icon(
-                            Icons.near_me,
-                            size: 50.0,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                            child: _connectivityResult == ConnectivityResult.mobile ||
-                                    _connectivityResult == ConnectivityResult.wifi
-                                ? null
-                                : Text(difference)),
-                        TextButton(
-                          onPressed: () async {
-                            if (_connectivityResult == ConnectivityResult.mobile ||
-                                _connectivityResult == ConnectivityResult.wifi) {
-                              var typedName = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CityScreen(),
-                                ),
-                              );
-                              try {
-                                if (typedName != null) {
-                                  setState(() {
-                                    showSpinner = true;
-                                  });
-                                  var weatherData = await weatherModel.getCityWeather(typedName);
+                                try {
+                                  var weatherData = await weatherModel.getLocationWeather();
                                   var weatherDataOneCall = await weatherModel.getWeatherOneCall(
                                       weatherData['coord']['lat'], weatherData['coord']['lon']);
                                   updateUI(weatherData);
                                   updateUIOneCall(weatherDataOneCall);
-                                } else {
                                   setState(() {
                                     showSpinner = false;
                                   });
+                                } catch (e) {
+                                  print(e);
                                 }
-                              } catch (e) {
-                                print(e);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
                               }
+                            },
+                            child: const Icon(
+                              Icons.near_me,
+                              size: 50.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: SizedBox(
+                            child: _connectivityResult == ConnectivityResult.mobile ||
+                                    _connectivityResult == ConnectivityResult.wifi
+                                ? null
+                                : Text(getWeather.getDifference()),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
                               setState(() {
-                                showSpinner = false;
+                                language == rusLanguage
+                                    ? language = enLanguage
+                                    : language = rusLanguage;
                               });
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                            }
-                          },
-                          child: const Icon(
-                            Icons.location_city,
-                            size: 50.0,
-                            color: Colors.white,
+                            },
+                            child: Text(
+                              language,
+                              style: kLanguageTextStyle,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () async {
+                              if (_connectivityResult == ConnectivityResult.mobile ||
+                                  _connectivityResult == ConnectivityResult.wifi) {
+                                var typedName = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CityScreen(),
+                                  ),
+                                );
+                                try {
+                                  if (typedName != null) {
+                                    setState(() {
+                                      showSpinner = true;
+                                    });
+                                    var weatherData = await weatherModel.getCityWeather(typedName);
+                                    var weatherDataOneCall = await weatherModel.getWeatherOneCall(
+                                        weatherData['coord']['lat'], weatherData['coord']['lon']);
+                                    updateUI(weatherData);
+                                    updateUIOneCall(weatherDataOneCall);
+                                  } else {
+                                    setState(() {
+                                      showSpinner = false;
+                                    });
+                                  }
+                                } catch (e) {
+                                  print(e);
+                                }
+                                setState(() {
+                                  showSpinner = false;
+                                });
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              }
+                            },
+                            child: const Icon(
+                              Icons.location_city,
+                              size: 50.0,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
@@ -149,11 +166,11 @@ class _LocationScreenState extends State<LocationScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Text(
-                            '$temp°',
+                            getWeather.getCurrentTemp(language),
                             style: kTempTextStyle,
                           ),
                           Text(
-                            weatherIcon,
+                            weatherModel.getWeatherIcon(getWeather.condition),
                             style: kConditionTextStyle,
                           ),
                         ],
@@ -162,7 +179,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Text(
-                        '$weatherMessage in $cityName',
+                        '${weatherModel.getMessage(getWeather.temperature.toInt(), language)} ${getWeather.name}',
                         style: kMessageTextStyle,
                       ),
                     ),
@@ -303,34 +320,12 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void updateUI(dynamic weatherData) async {
     setState(() {
-      if (weatherData == null) {
-        temp = 0;
-        weatherIcon = 'Error';
-        weatherPicture = 'images/location_background.jpg';
-        weatherMessage = 'Unable to get weather data';
-        cityName = '';
-        return;
-      }
       getWeather = GetWeather.fromJson(weatherData);
-      temp = getWeather.temperature.toInt();
-      weatherMessage = weatherModel.getMessage(temp);
-      weatherIcon = weatherModel.getWeatherIcon(getWeather.condition);
-      weatherPicture = weatherModel.getWeatherPicture(getWeather.condition);
-      cityName = getWeather.name;
-      difference = getWeather.getDifference();
     });
   }
 
   void updateUIOneCall(dynamic weatherData) async {
     setState(() {
-      if (weatherData == null) {
-        temp = 0;
-        weatherIcon = 'Error';
-        weatherPicture = 'images/location_background.jpg';
-        weatherMessage = 'Unable to get weather data';
-        cityName = '';
-        return;
-      }
       getWeatherOneCall = GetWeatherOneCall.fromJson(weatherData);
     });
   }

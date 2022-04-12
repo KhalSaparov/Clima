@@ -88,15 +88,27 @@ class WeatherModel {
     }
   }
 
-  String getMessage(int temp) {
-    if (temp > 25) {
-      return 'It\'s 🍦 time';
-    } else if (temp > 20) {
-      return 'Time for shorts and 👕';
-    } else if (temp < 10) {
-      return 'You\'ll need 🧣 and 🧤';
+  String getMessage(int temp, String language) {
+    if (language == rusLanguage) {
+      if (temp > 25) {
+        return 'Время для 🍦 в';
+      } else if (temp > 20) {
+        return 'Пора одевать шорты и 👕 в';
+      } else if (temp < 10) {
+        return 'Надень 🧣 и 🧤, а то простудишься в';
+      } else {
+        return 'Берите 🧥 на всякий случай в';
+      }
     } else {
-      return 'Bring a 🧥 just in case';
+      if (temp > 77) {
+        return 'It\'s 🍦 time in';
+      } else if (temp > 68) {
+        return 'Time for shorts and 👕 in';
+      } else if (temp < 50) {
+        return 'You\'ll need 🧣 and 🧤 in';
+      } else {
+        return 'Bring a 🧥 just in case in';
+      }
     }
   }
 }

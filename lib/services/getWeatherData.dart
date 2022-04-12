@@ -1,7 +1,9 @@
 import 'package:clima/services/weather.dart';
+import 'package:clima/utilities/constants.dart';
 import 'package:date_format/date_format.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'getFahrenheit.dart';
 
 class GetWeatherOneCall {
   GetWeatherOneCall({
@@ -29,7 +31,7 @@ class GetWeatherOneCall {
   List getHourlyTemp() {
     List hourlyTemp = [];
     for (var i = 0; i <= 6; i++) {
-      double hTemp = double.parse(hourly[i]['temp'].toString());
+      double hTemp = hourly[i]['temp'];
       hourlyTemp.add(hTemp.toInt());
     }
     return hourlyTemp;
@@ -59,8 +61,8 @@ class GetWeatherOneCall {
   List getDailyTemp() {
     List dayTemp = [];
     for (var i = 0; i <= 6; i++) {
-      double minTemp = double.parse(daily[i]['temp']['min'].toString());
-      double maxTemp = double.parse(daily[i]['temp']['max'].toString());
+      double minTemp = daily[i]['temp']['min'];
+      double maxTemp = daily[i]['temp']['max'];
       dayTemp.add('min: ${minTemp.toInt()}° max: ${maxTemp.toInt()}°');
     }
     return dayTemp;
@@ -120,6 +122,15 @@ class GetWeather {
         'lon': lon,
         'dt': dt,
       };
+
+  String getCurrentTemp(String language) {
+    GetFahrenheit getCurrentF = GetFahrenheit(celsius: temperature);
+    if (language == rusLanguage) {
+      return '${temperature.toInt()} °C';
+    } else {
+      return '${getCurrentF.toFahrenheit()} °F';
+    }
+  }
 
   String getDifference() {
     var unix = DateTime.fromMillisecondsSinceEpoch(dt * 1000);

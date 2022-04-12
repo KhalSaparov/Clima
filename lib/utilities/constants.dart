@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 const String API_BOX = 'api_data';
 const String WEATHER_DATA = 'weatherData';
 const String WEATHER_ONE_CALL = 'weatherOneCall';
+const String enLanguage = '🇬🇧';
+const String rusLanguage = '🇷🇺';
 
 const snackBar = SnackBar(
   content: Text('Please turn on mobile internet or Wi-Fi'),
@@ -14,8 +16,13 @@ const kTempTextStyle = TextStyle(
 );
 
 const kMessageTextStyle = TextStyle(
-  fontFamily: 'Spartan MB',
+  fontFamily: 'Lobster',
   fontSize: 30.0,
+);
+
+const kLanguageTextStyle = TextStyle(
+  fontFamily: 'Spartan MB',
+  fontSize: 35.0,
 );
 
 const kIconTextStyle = TextStyle(

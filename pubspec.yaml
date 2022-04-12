@@ -41,3 +41,7 @@ flutter:
       fonts:
         - asset: fonts/SpartanMB-Black.otf
           weight: 900
+    - family: Lobster
+      fonts:
+        - asset: fonts/Lobster-Regular.ttf
+          weight: 900
