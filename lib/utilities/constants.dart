@@ -37,7 +37,8 @@ const kRowTextStyle = TextStyle(
 );
 
 const kColumnTextStyle = TextStyle(
-  fontFamily: 'Spartan MB',
+  fontFamily: 'Comfortaa',
+  fontWeight: FontWeight.w900,
   fontSize: 18.0,
 );
 

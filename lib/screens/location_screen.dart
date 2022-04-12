@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'dart:developer';
 
-import 'package:clima/services/getWeatherData.dart';
+import 'package:clima/services/get_weatherData.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:clima/utilities/constants.dart';
@@ -78,7 +79,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                     showSpinner = false;
                                   });
                                 } catch (e) {
-                                  print(e);
+                                  log('$e');
                                 }
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -142,7 +143,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                     });
                                   }
                                 } catch (e) {
-                                  print(e);
+                                  log('$e');
                                 }
                                 setState(() {
                                   showSpinner = false;
@@ -208,7 +209,7 @@ class _LocationScreenState extends State<LocationScreen> {
                           physics: const ClampingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           shrinkWrap: true,
-                          itemCount: getWeatherOneCall.getHourlyTemp().length,
+                          itemCount: getWeatherOneCall.getHour().length,
                           itemBuilder: (BuildContext context, int position) {
                             return Padding(
                               padding: const EdgeInsets.all(5.0),
@@ -233,7 +234,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                             style: kIconTextStyle,
                                           ),
                                           Text(
-                                            '${getWeatherOneCall.getHourlyTemp()[position]}°',
+                                            '${getWeatherOneCall.getHourlyTemp(language)[position]}°',
                                             style: kRowTextStyle,
                                           ),
                                         ],
@@ -258,7 +259,7 @@ class _LocationScreenState extends State<LocationScreen> {
                               physics: const NeverScrollableScrollPhysics(),
                               scrollDirection: Axis.vertical,
                               shrinkWrap: true,
-                              itemCount: getWeatherOneCall.getHourlyTemp().length,
+                              itemCount: getWeatherOneCall.getDay().length,
                               itemBuilder: (BuildContext context, int position) {
                                 return Column(
                                   children: [
@@ -276,14 +277,15 @@ class _LocationScreenState extends State<LocationScreen> {
                                             child: Text(
                                               '${getWeatherOneCall.getDailyCon()[position]}',
                                               style: kIconTextStyle,
-                                              textAlign: TextAlign.center,
+                                              textAlign: TextAlign.end,
                                             ),
                                           ),
                                           Expanded(
-                                            flex: 2,
+                                            flex: 3,
                                             child: Text(
-                                              '${getWeatherOneCall.getDailyTemp()[position]}',
+                                              '${getWeatherOneCall.getDailyTemp(language)[position]}',
                                               style: kColumnTextStyle,
+                                              textAlign: TextAlign.end,
                                             ),
                                           ),
                                         ],
@@ -317,7 +319,6 @@ class _LocationScreenState extends State<LocationScreen> {
         Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       setState(() {
         _connectivityResult = result;
-        print(_connectivityResult);
       });
     });
     final ConnectivityResult result = await Connectivity().checkConnectivity();

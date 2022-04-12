@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import 'getFahrenheit.dart';
+import 'get_fahrenheit.dart';
 
 class GetWeatherOneCall {
   GetWeatherOneCall({
@@ -30,11 +30,16 @@ class GetWeatherOneCall {
         'timezone': timeZone,
       };
 
-  List getHourlyTemp() {
+  List getHourlyTemp(String language) {
     List hourlyTemp = [];
     for (var i = 0; i <= 6; i++) {
       double hTemp = hourly[i]['temp'];
-      hourlyTemp.add(hTemp.toInt());
+      GetFahrenheit getHourlyMaxF = GetFahrenheit(celsius: hTemp);
+      if (language == rusLanguage) {
+        hourlyTemp.add('${hTemp.toInt()}°C');
+      } else {
+        hourlyTemp.add('${getHourlyMaxF.toFahrenheit()}°F');
+      }
     }
     return hourlyTemp;
   }
@@ -60,12 +65,18 @@ class GetWeatherOneCall {
     return hourList;
   }
 
-  List getDailyTemp() {
+  List getDailyTemp(String language) {
     List dayTemp = [];
     for (var i = 0; i <= 6; i++) {
       double minTemp = daily[i]['temp']['min'];
       double maxTemp = daily[i]['temp']['max'];
-      dayTemp.add('min: ${minTemp.toInt()}° max: ${maxTemp.toInt()}°');
+      GetFahrenheit getDailyMinF = GetFahrenheit(celsius: minTemp);
+      GetFahrenheit getDailyMaxF = GetFahrenheit(celsius: maxTemp);
+      if (language == rusLanguage) {
+        dayTemp.add('мин: ${minTemp.toInt()}°C макс: ${maxTemp.toInt()}°C');
+      } else {
+        dayTemp.add('min: ${getDailyMinF.toFahrenheit()}°F max: ${getDailyMaxF.toFahrenheit()}°F');
+      }
     }
     return dayTemp;
   }

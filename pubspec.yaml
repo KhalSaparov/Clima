@@ -46,3 +46,7 @@ flutter:
       fonts:
         - asset: fonts/Lobster-Regular.ttf
           weight: 900
+    - family: Comfortaa
+      fonts:
+        - asset: fonts/Comfortaa-Bold.ttf
+          weight: 900
