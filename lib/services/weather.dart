@@ -81,13 +81,13 @@ class WeatherModel {
     } else if (condition < 400) {
       return 'images/rainy.jpg';
     } else if (condition < 600) {
-      return 'images/rainy.jpg';
+      return 'images/rain.jpg';
     } else if (condition < 700) {
       return 'images/snow.jpg';
     } else if (condition < 800) {
       return 'images/fog.jpg';
     } else if (condition == 800) {
-      return 'images/shine.jpg️';
+      return 'images/shine.jpg';
     } else if (condition <= 804) {
       return 'images/cloud.jpg';
     } else {
@@ -100,7 +100,7 @@ class WeatherModel {
       if (temp > 25) {
         return 'Время для 🍦';
       } else if (temp > 20) {
-        return 'Пора одевать шорты и 👕';
+        return 'Пора одевать 🩳 и 👕';
       } else if (temp < 10) {
         return 'Надень 🧣 и 🧤, а то простудишься';
       } else {
@@ -110,7 +110,7 @@ class WeatherModel {
       if (temp > 77) {
         return 'It\'s 🍦 time';
       } else if (temp > 68) {
-        return 'Time for shorts and 👕';
+        return 'Time for 🩳 and 👕';
       } else if (temp < 50) {
         return 'You\'ll need 🧣 and 🧤';
       } else {
