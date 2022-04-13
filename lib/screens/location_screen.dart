@@ -242,7 +242,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                             style: kIconTextStyle,
                                           ),
                                           Text(
-                                            '${getWeatherOneCall.getHourlyTemp(language)[position]}°',
+                                            '${getWeatherOneCall.getHourlyTemp(language)[position]}',
                                             style: kRowTextStyle,
                                           ),
                                         ],
