@@ -33,7 +33,7 @@ class GetWeatherOneCall {
   List getHourlyTemp(String language) {
     List hourlyTemp = [];
     for (var i = 0; i <= 6; i++) {
-      double hTemp = hourly[i]['temp'];
+      double hTemp = double.parse(hourly[i]['temp'].toString());
       GetFahrenheit getHourlyMaxF = GetFahrenheit(celsius: hTemp);
       if (language == rusLanguage) {
         hourlyTemp.add('${hTemp.toInt()}°C');
