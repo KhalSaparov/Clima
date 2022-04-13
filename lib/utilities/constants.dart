@@ -7,8 +7,20 @@ const String CITY_RU = 'cityRU';
 const String enLanguage = '🇬🇧';
 const String rusLanguage = '🇷🇺';
 
-const snackBar = SnackBar(
+const snackBarRu = SnackBar(
+  content: Text('Пожалуйста включите интернет'),
+);
+
+const snackBarEn = SnackBar(
   content: Text('Please turn on mobile internet or Wi-Fi'),
+);
+
+const snackBarRuError = SnackBar(
+  content: Text('Неверный ввод города'),
+);
+
+const snackBarEnError = SnackBar(
+  content: Text('Invalid input city name'),
 );
 
 const kTempTextStyle = TextStyle(

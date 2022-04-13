@@ -80,8 +80,8 @@ class GetWeatherOneCall {
   List getDailyTemp(String language) {
     List dayTemp = [];
     for (var i = 0; i <= 6; i++) {
-      double minTemp = daily[i]['temp']['min'];
-      double maxTemp = daily[i]['temp']['max'];
+      double minTemp = double.parse(daily[i]['temp']['min'].toString());
+      double maxTemp = double.parse(daily[i]['temp']['max'].toString());
       GetFahrenheit getDailyMinF = GetFahrenheit(celsius: minTemp);
       GetFahrenheit getDailyMaxF = GetFahrenheit(celsius: maxTemp);
       if (language == rusLanguage) {
@@ -109,7 +109,7 @@ class GetWeatherOneCall {
     for (var i = 0; i <= 6; i++) {
       var time = DateTime.fromMillisecondsSinceEpoch(daily[i]['dt'] * 1000);
       var day = tz.TZDateTime.from(time, getTimeZone);
-      dayList.add(formatDate(day, [MM, ' ', dd]));
+      dayList.add(formatDate(day, [mm, '.', dd, '.', yy]));
     }
     return dayList;
   }

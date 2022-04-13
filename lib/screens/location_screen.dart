@@ -81,9 +81,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                   });
                                 } catch (e) {
                                   log('$e');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      language == rusLanguage ? snackBarRuError : snackBarEnError);
                                 }
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    language == rusLanguage ? snackBarRu : snackBarEn);
                               }
                             },
                             child: const Icon(
@@ -150,7 +153,8 @@ class _LocationScreenState extends State<LocationScreen> {
                                   showSpinner = false;
                                 });
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    language == rusLanguage ? snackBarRu : snackBarEn);
                               }
                             },
                             child: const Icon(
